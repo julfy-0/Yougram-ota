@@ -2,6 +2,5 @@ name = "yougram-ota"
 main = "worker.js"
 compatibility_date = "2025-01-01"
 
-# R2 не нужен: APK и JSON лежат в самом репозитории (папки apks/ и jsons/).
-# Необязательно — свой домен вместо *.workers.dev (домен должен быть в вашем аккаунте Cloudflare):
-# routes = [{ pattern = "ota.example.com", custom_domain = true }]
+[assets]
+directory = "./docs"
