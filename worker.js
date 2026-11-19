@@ -1,6 +1,6 @@
 /**
  * Yougram OTA — Cloudflare Worker без R2. Данные лежат в GitHub-репозитории (папки в ветке main):
- *   apks/Yougram-v<версия>.apk
+ *   apks/Yougram-v<версия>.apk   (или .zip с одним APK внутри, если APK больше 100 МБ)
  *   jsons/Update-v<версия>.json
  *   banners/Banner-v<версия>.png     (необязательно)
  * Версия вида 1.4.4-b1 (beta) или 1.4.4-r (стабильная). Воркер берёт самую новую версию канала по номеру.
@@ -44,8 +44,8 @@ export default {
         const man = await latest(m[1], env);
         if (!man || man.versionCode !== Number(m[2])) return json({ error: "not_found" }, 404);
         return await proxy(req, man.apkUrl, {
-          type: "application/vnd.android.package-archive",
-          filename: `yougram-${man.versionCode}.apk`,
+          type: man.zip ? "application/zip" : "application/vnd.android.package-archive",
+          filename: `yougram-${man.versionCode}.${man.zip ? "zip" : "apk"}`,
         });
       }
       m = path.match(/^\/v1\/banner\/(release|beta)\/(\d{1,9})$/);
@@ -111,7 +111,8 @@ async function latest(channel, env) {
     return {
       ...man,
       beta: Number.isInteger(man.beta) ? man.beta : channel === "beta" ? 1 : 0,
-      apkUrl: `${RAW}/apks/Yougram-v${c.ver}.apk`,
+      // zip: true — на GitHub лежит ZIP с одним APK внутри (обход лимита 100 МБ на файл)
+      apkUrl: `${RAW}/apks/Yougram-v${c.ver}.${man.zip ? "zip" : "apk"}`,
       banner: man.banner ? `${RAW}/banners/Banner-v${c.ver}.png` : null,
     };
   }
@@ -161,6 +162,9 @@ async function check(url, env) {
     notes: best.notes || "",
     size: best.size || 0,
     sha256: best.sha256 || null,
+    zip: Boolean(best.zip),
+    zipSize: best.zipSize || 0,
+    zipSha256: best.zipSha256 || null,
     apkUrl: `${base}/apk/${bestChannel}/${best.versionCode}`,
     bannerUrl: best.banner ? `${base}/banner/${bestChannel}/${best.versionCode}` : null,
   });

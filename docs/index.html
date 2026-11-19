@@ -303,7 +303,8 @@
   function label(r) {
     return r.channel === "beta" ? "бета " + (r.data.beta || "") : "стабильная";
   }
-  function apkUrl(r) { return RAW + "/apks/Yougram-v" + r.ver + ".apk"; }
+  function apkUrl(r) { return RAW + "/apks/Yougram-v" + r.ver + (r.data.zip ? ".zip" : ".apk"); }
+  function sizeOf(r) { return r.data.zip && r.data.zipSize ? r.data.zipSize : r.data.size; }
 
   function state(title, text, withLink) {
     $latest.setAttribute("aria-busy", "false");
@@ -354,7 +355,7 @@
     v.appendChild(el("span", "badge", label(cur)));
     $latest.appendChild(v);
 
-    var meta = [fmtDate(cur.data.publishedAt), fmtSize(cur.data.size)].filter(Boolean).join(" · ");
+    var meta = [fmtDate(cur.data.publishedAt), fmtSize(sizeOf(cur))].filter(Boolean).join(" · ");
     if (meta) $latest.appendChild(el("p", "meta", meta));
 
     var notes = String(cur.data.notes || "").split("\n").map(function (s) { return s.replace(/^\s*[-•*]\s*/, "").trim(); }).filter(Boolean);
@@ -368,9 +369,9 @@
     a.href = apkUrl(cur);
     a.setAttribute("download", "");
     a.innerHTML = ICON_DL;
-    a.appendChild(el("span", null, "Скачать Yougram " + cur.data.versionName));
+    a.appendChild(el("span", null, (cur.data.zip ? "Скачать Yougram " : "Скачать Yougram ") + cur.data.versionName));
     $latest.appendChild(a);
-    $latest.appendChild(el("p", "hint", "Android 8.0 и новее. При установке разрешите установку из этого источника."));
+    $latest.appendChild(el("p", "hint", (cur.data.zip ? "Скачается ZIP-архив: распакуйте его, внутри файл APK. " : "") + "Android 8.0 и новее. При установке разрешите установку из этого источника."));
 
     if (cur.data.sha256) {
       var h = el("div", "hash");
@@ -396,7 +397,7 @@
     rest.forEach(function (r) {
       var li = el("li", "item");
       var title = el("b", null, r.data.versionName + " · " + label(r));
-      var sub = el("small", null, [fmtDate(r.data.publishedAt), fmtSize(r.data.size)].filter(Boolean).join(" · ") || "Файл APK");
+      var sub = el("small", null, [fmtDate(r.data.publishedAt), fmtSize(sizeOf(r)), r.data.zip ? "ZIP" : ""].filter(Boolean).join(" · ") || "Файл APK");
       var dl = el("a", null, "Скачать");
       dl.href = apkUrl(r);
       dl.setAttribute("download", "");
