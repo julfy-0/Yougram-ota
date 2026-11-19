@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Yougram — скачать</title>
+<meta name="description" content="Скачайте последнюю версию Yougram для Android. Старые версии тоже доступны.">
+<meta name="theme-color" content="#e9ecfb">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600&family=Unbounded:wght@600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #15163a;
+    --ink-soft: #4b4d78;
+    --paper: #e9ecfb;
+    --glass: rgba(255, 255, 255, .5);
+    --glass-edge: rgba(255, 255, 255, .85);
+    --accent: #3b54ff;
+    --accent-ink: #ffffff;
+    --blob-a: #5b6cff;
+    --blob-b: #ff8fa3;
+    --blob-c: #62dcc0;
+    --word: #15163a;
+    --row: rgba(21, 22, 58, .06);
+    --shadow: 0 30px 60px -30px rgba(40, 50, 140, .45);
+    --display: "Unbounded", "Arial Black", system-ui, sans-serif;
+    --text: "Onest", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ink: #eceeff;
+      --ink-soft: #a6a9d6;
+      --paper: #0f1030;
+      --glass: rgba(30, 32, 84, .45);
+      --glass-edge: rgba(150, 160, 255, .28);
+      --accent: #7f92ff;
+      --accent-ink: #0f1030;
+      --blob-a: #3a4bff;
+      --blob-b: #c2406b;
+      --blob-c: #1fa58b;
+      --word: #eceeff;
+      --row: rgba(236, 238, 255, .07);
+      --shadow: 0 30px 60px -30px rgba(0, 0, 0, .7);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--paper);
+    color: var(--ink);
+    font: 400 1rem/1.55 var(--text);
+    overflow-x: hidden;
+  }
+
+  /* Цветные пятна под стеклом: карточка их размывает так же, как бары в самом приложении */
+  .blobs { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+  .blobs i { position: absolute; border-radius: 50%; filter: blur(2px); opacity: .9; }
+  .blobs i:nth-child(1) { width: 46vmax; height: 46vmax; left: -14vmax; top: -10vmax; background: var(--blob-a); }
+  .blobs i:nth-child(2) { width: 34vmax; height: 34vmax; right: -10vmax; top: 22vh; background: var(--blob-b); }
+  .blobs i:nth-child(3) { width: 30vmax; height: 30vmax; left: 18vw; bottom: -16vmax; background: var(--blob-c); }
+
+  main {
+    position: relative;
+    z-index: 1;
+    width: min(100% - 32px, 600px);
+    margin: 0 auto;
+    padding: clamp(40px, 9vh, 96px) 0 72px;
+  }
+
+  h1 {
+    margin: 0;
+    font: 800 clamp(3.2rem, 17vw, 6.4rem)/.9 var(--display);
+    letter-spacing: -.045em;
+    color: var(--word);
+    /* нижняя часть слова уходит под стекло карточки */
+    margin-bottom: clamp(-1.5rem, -3.4vw, -.7rem);
+    position: relative;
+    z-index: 0;
+  }
+
+  .card {
+    position: relative;
+    z-index: 1;
+    padding: clamp(22px, 5vw, 32px);
+    border-radius: 28px;
+    background: var(--glass);
+    border: 1px solid var(--glass-edge);
+    -webkit-backdrop-filter: blur(26px) saturate(1.5);
+    backdrop-filter: blur(26px) saturate(1.5);
+    box-shadow: var(--shadow);
+  }
+
+  .seg {
+    display: inline-flex;
+    padding: 3px;
+    gap: 2px;
+    border-radius: 999px;
+    background: var(--row);
+    margin-bottom: 22px;
+  }
+  .seg button {
+    font: 500 .9rem var(--text);
+    color: var(--ink-soft);
+    background: none;
+    border: 0;
+    padding: 7px 16px;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+  .seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+
+  .ver { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; }
+  .ver strong { font: 600 clamp(1.9rem, 8vw, 2.5rem)/1.1 var(--display); letter-spacing: -.03em; }
+  .badge {
+    font-size: .85rem;
+    font-weight: 500;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: var(--row);
+    color: var(--ink-soft);
+    white-space: nowrap;
+  }
+  .meta { margin: 6px 0 0; color: var(--ink-soft); }
+
+  .notes { margin: 20px 0 0; padding: 0; list-style: none; max-width: 52ch; }
+  .notes li { padding: 3px 0 3px 18px; position: relative; }
+  .notes li::before { content: ""; position: absolute; left: 2px; top: .85em; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+  .notes p { margin: 0; }
+
+  .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    margin-top: 26px;
+    padding: 16px 20px;
+    border-radius: 18px;
+    background: var(--accent);
+    color: var(--accent-ink);
+    font: 600 1.05rem var(--text);
+    text-decoration: none;
+    transition: transform .15s ease, filter .15s ease;
+  }
+  .btn:hover { filter: brightness(1.08); }
+  .btn:active { transform: scale(.985); }
+  .btn svg { width: 20px; height: 20px; flex: none; }
+
+  .hint { margin: 12px 2px 0; font-size: .875rem; color: var(--ink-soft); }
+
+  .hash {
+    display: flex; align-items: center; gap: 10px;
+    margin-top: 18px; padding-top: 16px;
+    border-top: 1px solid var(--glass-edge);
+    font-size: .8125rem; color: var(--ink-soft);
+  }
+  .hash code {
+    flex: 1; min-width: 0;
+    font: 400 .78rem/1.3 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .hash button {
+    font: 500 .8125rem var(--text);
+    color: var(--ink);
+    background: var(--row);
+    border: 0; border-radius: 10px;
+    padding: 6px 12px; cursor: pointer;
+  }
+
+  .more {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%;
+    margin-top: 18px;
+    padding: 14px 18px;
+    border-radius: 18px;
+    background: var(--glass);
+    border: 1px solid var(--glass-edge);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    color: var(--ink);
+    font: 500 1rem var(--text);
+    cursor: pointer;
+  }
+  .more svg { width: 18px; height: 18px; transition: transform .3s ease; }
+  .more[aria-expanded="true"] svg { transform: rotate(180deg); }
+
+  .fold { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .35s ease; }
+  .fold.open { grid-template-rows: 1fr; }
+  .fold > div { overflow: hidden; }
+
+  .list { margin: 12px 0 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+  .item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 2px 12px;
+    padding: 14px 16px;
+    border-radius: 18px;
+    background: var(--glass);
+    border: 1px solid var(--glass-edge);
+  }
+  .item b { font-weight: 600; }
+  .item small { grid-column: 1; color: var(--ink-soft); font-size: .875rem; }
+  .item a {
+    grid-column: 2; grid-row: 1 / span 2;
+    padding: 9px 16px; border-radius: 12px;
+    background: var(--ink); color: var(--paper);
+    font-weight: 500; font-size: .9rem; text-decoration: none;
+  }
+  .item a:hover { filter: brightness(1.2); }
+
+  .state { text-align: left; }
+  .state h2 { margin: 0 0 6px; font: 600 1.3rem/1.2 var(--display); letter-spacing: -.02em; }
+  .state p { margin: 0; color: var(--ink-soft); }
+  .state a { color: var(--accent); }
+  .skeleton span { display: block; height: 14px; border-radius: 7px; background: var(--row); margin: 10px 0; animation: pulse 1.4s ease-in-out infinite; }
+  .skeleton span:first-child { height: 38px; width: 55%; border-radius: 12px; }
+  .skeleton span:nth-child(3) { width: 80%; }
+  @keyframes pulse { 50% { opacity: .45; } }
+
+  footer { margin-top: 36px; text-align: center; font-size: .875rem; color: var(--ink-soft); }
+  footer a { color: inherit; }
+
+  :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="blobs" aria-hidden="true"><i></i><i></i><i></i></div>
+
+<main>
+  <h1>Yougram</h1>
+
+  <section class="card" id="latest" aria-live="polite" aria-busy="true">
+    <div class="skeleton" aria-label="Загрузка"><span></span><span></span><span></span></div>
+  </section>
+
+  <button class="more" id="toggle" type="button" aria-expanded="false" aria-controls="old" hidden>
+    <span>Старые версии</span>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+  </button>
+  <div class="fold" id="old"><div><ul class="list" id="oldList"></ul></div></div>
+
+  <footer id="foot"></footer>
+</main>
+
+<script>
+(function () {
+  // ===== Настройки: репозиторий, где лежат apks/ и jsons/ =====
+  var OWNER = "julfy-0";
+  var REPO = "Yougram-ota";
+  var BRANCH = "main";
+  var MAX_VERSIONS = 40;
+  // ============================================================
+
+  var RAW = "https://raw.githubusercontent.com/" + OWNER + "/" + REPO + "/" + BRANCH;
+  var API = "https://api.github.com/repos/" + OWNER + "/" + REPO + "/contents/jsons?ref=" + BRANCH;
+  var REPO_URL = "https://github.com/" + OWNER + "/" + REPO;
+
+  var $latest = document.getElementById("latest");
+  var $toggle = document.getElementById("toggle");
+  var $old = document.getElementById("old");
+  var $oldList = document.getElementById("oldList");
+  document.getElementById("foot").innerHTML = '<a href="' + REPO_URL + '">Файлы на GitHub</a>';
+
+  var releases = [];
+  var channel = "release";
+  try { channel = localStorage.getItem("yg_channel") || "release"; } catch (e) {}
+
+  var ICON_DL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0 4.5-4.5M12 15l-4.5-4.5M5 19h14"/></svg>';
+
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    return n;
+  }
+
+  // "1.4.4-b2" → [1,4,4,0,2]; "1.4.4-r" / "1.4.4" → [1,4,4,1,0]
+  function versionKey(v) {
+    var m = v.match(/^(\d+)\.(\d+)\.(\d+)(?:-(?:b(\d+)|r))?$/i);
+    if (!m) return null;
+    var beta = /-b\d+$/i.test(v);
+    return [+m[1], +m[2], +m[3], beta ? 0 : 1, beta ? +m[4] : 0];
+  }
+  function cmp(a, b) {
+    for (var i = 0; i < a.length; i++) if (a[i] !== b[i]) return b[i] - a[i];
+    return 0;
+  }
+  function fmtSize(n) { return n ? (n / 1048576).toFixed(1).replace(".", ",") + " МБ" : ""; }
+  function fmtDate(s) {
+    if (!s) return "";
+    var d = new Date(s);
+    return isNaN(d) ? "" : d.toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" });
+  }
+  function label(r) {
+    return r.channel === "beta" ? "бета " + (r.data.beta || "") : "стабильная";
+  }
+  function apkUrl(r) { return RAW + "/apks/Yougram-v" + r.ver + ".apk"; }
+
+  function state(title, text, withLink) {
+    $latest.setAttribute("aria-busy", "false");
+    $latest.innerHTML = "";
+    var box = el("div", "state");
+    box.appendChild(el("h2", null, title));
+    var p = el("p", null, text);
+    if (withLink) {
+      p.appendChild(document.createTextNode(" "));
+      var a = el("a", null, "Открыть файлы на GitHub");
+      a.href = REPO_URL;
+      p.appendChild(a);
+    }
+    box.appendChild(p);
+    $latest.appendChild(box);
+  }
+
+  function renderLatest() {
+    var hasRelease = releases.some(function (r) { return r.channel === "release"; });
+    var hasBeta = releases.some(function (r) { return r.channel === "beta"; });
+    if (channel === "release" && !hasRelease && hasBeta) channel = "beta";
+    if (channel === "beta" && !hasBeta && hasRelease) channel = "release";
+
+    var cur = releases.filter(function (r) { return r.channel === channel; })[0];
+    $latest.setAttribute("aria-busy", "false");
+    $latest.innerHTML = "";
+
+    if (hasRelease && hasBeta) {
+      var seg = el("div", "seg");
+      seg.setAttribute("role", "group");
+      seg.setAttribute("aria-label", "Канал обновлений");
+      [["release", "Стабильная"], ["beta", "Бета"]].forEach(function (c) {
+        var b = el("button", null, c[1]);
+        b.type = "button";
+        b.setAttribute("aria-pressed", String(channel === c[0]));
+        b.onclick = function () {
+          channel = c[0];
+          try { localStorage.setItem("yg_channel", channel); } catch (e) {}
+          render();
+        };
+        seg.appendChild(b);
+      });
+      $latest.appendChild(seg);
+    }
+
+    var v = el("div", "ver");
+    v.appendChild(el("strong", null, cur.data.versionName));
+    v.appendChild(el("span", "badge", label(cur)));
+    $latest.appendChild(v);
+
+    var meta = [fmtDate(cur.data.publishedAt), fmtSize(cur.data.size)].filter(Boolean).join(" · ");
+    if (meta) $latest.appendChild(el("p", "meta", meta));
+
+    var notes = String(cur.data.notes || "").split("\n").map(function (s) { return s.replace(/^\s*[-•*]\s*/, "").trim(); }).filter(Boolean);
+    if (notes.length) {
+      var ul = el("ul", "notes");
+      notes.forEach(function (n) { ul.appendChild(el("li", null, n)); });
+      $latest.appendChild(ul);
+    }
+
+    var a = el("a", "btn");
+    a.href = apkUrl(cur);
+    a.setAttribute("download", "");
+    a.innerHTML = ICON_DL;
+    a.appendChild(el("span", null, "Скачать Yougram " + cur.data.versionName));
+    $latest.appendChild(a);
+    $latest.appendChild(el("p", "hint", "Android 8.0 и новее. При установке разрешите установку из этого источника."));
+
+    if (cur.data.sha256) {
+      var h = el("div", "hash");
+      h.appendChild(el("span", null, "sha256"));
+      h.appendChild(el("code", null, cur.data.sha256));
+      var cp = el("button", null, "Копировать");
+      cp.type = "button";
+      cp.onclick = function () {
+        function done() { cp.textContent = "Скопировано"; setTimeout(function () { cp.textContent = "Копировать"; }, 1600); }
+        try { navigator.clipboard.writeText(cur.data.sha256).then(done, function () {}); } catch (e) {}
+      };
+      h.appendChild(cp);
+      $latest.appendChild(h);
+    }
+    return cur;
+  }
+
+  function renderOld(cur) {
+    $oldList.innerHTML = "";
+    var rest = releases.filter(function (r) { return r !== cur; });
+    if (!rest.length) { $toggle.hidden = true; return; }
+    $toggle.hidden = false;
+    rest.forEach(function (r) {
+      var li = el("li", "item");
+      var title = el("b", null, r.data.versionName + " · " + label(r));
+      var sub = el("small", null, [fmtDate(r.data.publishedAt), fmtSize(r.data.size)].filter(Boolean).join(" · ") || "Файл APK");
+      var dl = el("a", null, "Скачать");
+      dl.href = apkUrl(r);
+      dl.setAttribute("download", "");
+      dl.setAttribute("aria-label", "Скачать Yougram " + r.data.versionName + ", " + label(r));
+      li.appendChild(title); li.appendChild(sub); li.appendChild(dl);
+      $oldList.appendChild(li);
+    });
+  }
+
+  function render() { renderOld(renderLatest()); }
+
+  function setOpen(open) {
+    $toggle.setAttribute("aria-expanded", String(open));
+    $old.classList.toggle("open", open);
+    if (open) $old.removeAttribute("inert"); else $old.setAttribute("inert", "");
+  }
+  $old.setAttribute("inert", "");
+  $toggle.onclick = function () { setOpen($toggle.getAttribute("aria-expanded") !== "true"); };
+
+  function getJSON(url) {
+    return fetch(url).then(function (r) {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    });
+  }
+
+  getJSON(API).then(function (files) {
+    var items = [];
+    files.forEach(function (f) {
+      var m = /^Update-v(.+)\.json$/i.exec(f.name);
+      var key = m && versionKey(m[1]);
+      if (key) items.push({ ver: m[1], key: key, name: f.name, channel: /-b\d+$/i.test(m[1]) ? "beta" : "release" });
+    });
+    items.sort(function (a, b) { return cmp(a.key, b.key); });
+    items = items.slice(0, MAX_VERSIONS);
+    if (!items.length) { state("Версий пока нет", "Первая сборка ещё не опубликована.", false); return; }
+    return Promise.all(items.map(function (it) {
+      return getJSON(RAW + "/jsons/" + encodeURIComponent(it.name)).then(function (d) { it.data = d; return it; }, function () { return null; });
+    })).then(function (all) {
+      releases = all.filter(function (r) { return r && r.data && r.data.versionName; });
+      if (!releases.length) { state("Версий пока нет", "Описания версий не найдены.", false); return; }
+      render();
+    });
+  }).catch(function () {
+    state("Не удалось загрузить версии", "Проверьте соединение и обновите страницу.", true);
+  });
+})();
+</script>
+</body>
+</html>
