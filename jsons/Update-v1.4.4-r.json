@@ -1,0 +1,10 @@
+{
+  "versionName": "1.4.4",
+  "versionCode": 43,
+  "beta": 0,
+  "notes": "- Всё из бет 1.4.4\n- Исправления",
+  "size": 96468992,
+  "sha256": "хэш в нижнем регистре",
+  "banner": false,
+  "rollout": 100
+}
