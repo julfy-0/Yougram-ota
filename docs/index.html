@@ -371,7 +371,7 @@
     a.innerHTML = ICON_DL;
     a.appendChild(el("span", null, (cur.data.zip ? "Скачать Yougram " : "Скачать Yougram ") + cur.data.versionName));
     $latest.appendChild(a);
-    $latest.appendChild(el("p", "hint", (cur.data.zip ? "Скачается ZIP-архив: распакуйте его, внутри файл APK. " : "") + "Android 8.0 и новее. При установке разрешите установку из этого источника."));
+    $latest.appendChild(el("p", "hint", (cur.data.zip ? "Скачается ZIP-архив: распакуйте его, внутри файл APK. " : "") + "Android 10 и новее. При установке разрешите установку из этого источника."));
 
     if (cur.data.sha256) {
       var h = el("div", "hash");
